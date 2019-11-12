@@ -86,3 +86,27 @@ public class SoupPvPPlugin extends JavaPlugin {
 		PacketHandler.unregisterPacketListener(customNpcListener);
   }
 ~~~
+
+# NPCにスキンを付ける方法
+~~~
+public class JoinListener implements Listener {
+
+  private static HashMap<String, Property> properties;
+
+  public JoinListener() {
+    npcs = Lists.newArrayList();
+    holograms = Lists.newArrayList();
+    properties = new HashMap<>();
+    properties.put("tyuro", new Property("textures",
+	"eyJ0aW1lc3RhbXAiOjE1NTMxNzA5OTI4MDEsInByb2ZpbGVJZCI6ImE1OTQwMTgzOGZkOTQyNzJiOWVhMGQyOGM1NzgwZTY4IiwicHJvZmlsZU5hbWUiOiJrb2t1bWluIiwic2lnbmF0dXJlUmVxdWlyZWQiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81MmVmMzU4ZjRjYWY0M2E3ZWM3NGIxMTcyNjJkODlmYTQzODc0NzNhOTY3Mzk0MTY2NWZmYWEyMjc2NmM5Mjg2In19fQ==",
+	"xArKCRHBmkBviAd2MXo2w4iNz+5uTPuSXsbdXl8XnxmpGrND1XMxIjhCTlzYHKR/8QVG7ajcZ/pVrMRgFFuXg4LyI+SsJOxD1SGCu1RtUX90KEaebx+czawSYsF2OTCv8B43uSmxxCbsN2up3u90WfbUEQjhqD67SyJHZ9hna+2xy6PsI2V/D0JbnAloH5s4fiRRbnf+MA1gFujOkb74Tp8cPY9AeLEYYcmYIIKwaeZqnABlzVPAN3PUHAvNZoBIGZ8nm+25yNKRdrr+a8AZxoMBOWgep1450s0x+cMAwXFdxrkHQLZLqXf6lLK93fR0kX4Rs8wayB7sENnDU1zhTypCXeHX3G5ZaSE/eraq5SYRlphtxCNYZrlpWa7sMLt/irmVLODoi9SFAzjmsZH+TWgvoNtBCpYluhnvo3EpLW0EzfumKzt8Df3A3bIzmdjsGh/xFvGQN+mmc/0BbgTeirMEmWJxzqwzYtic9uA+x6UYgG3dN5DYONcaOSE7NOSoljOHVJaFblm7VqcKM75ZEi7pNtZq32hECiXfh0A5Qk5SBuNbFMaGALtcnPa4wsPaA+2YN0TKulG64bh0ZWypfSu3/Qk+Pk5v9ZsI/YH1bZioi3K6Y3vOnxKQ92hdymz1PtC4I6EkISvknL4+15eeF/lhrp8T9VSycbT3etW7izo="));
+  }
+
+  public void onJoin(PlayerJoinEvent event) {
+    Player p = event.getPlayer();
+    NPC npc = new NPC(p, "Perk Shop(CLICK)", UUID.randomUUID(), p.getWorld());
+    npc.setSkin(properties.get("tyuro"));
+    npc.spawn(LocationUtil.get("npc-shop"), false);
+  }
+}
+~~~
