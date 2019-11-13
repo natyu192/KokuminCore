@@ -1,4 +1,5 @@
 # KokuminCore
+国民サーバーで使ってました
 NPCとホログラムがかんたんに作れるライブラリ？です<br>
 あとPacketListener的なこともできます（パケット書き換えなど）
 # 仕様
@@ -6,7 +7,7 @@ NPCとホログラムがかんたんに作れるライブラリ？です<br>
 ・プレイヤーごとに個別のNPCが表示されている<br>
 ・NPCを削除する場合はdestroy()、Hologramを削除する場合はremove()を使う<br>
 　↑をしない限り、必ず表示される（はず）<br>
-# クリックイベントを読み取る
+# NPCのクリックイベントを読み取る
 流れとしては、PacketPlayInUseEntityをプレイヤーから受け取ったとき、クリックした対象のエンティティを取得し、そのIDがNPCと一致するかをチェックしてNPCにつけておいたTagでいろいろ処理する感じ...
 ### CustomNPCListener.class (PacketListenerの役割）
 ~~~
