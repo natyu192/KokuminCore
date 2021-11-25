@@ -17,8 +17,13 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
 
 public class NPCDisplayListener implements PacketListener {
 
+	public static boolean active = true;
+
 	@Override
 	public void playerReceivePacket(PacketInfo packet) {
+		if (!active) {
+			return;
+		}
 		if (packet.getPacket() instanceof PacketPlayOutMapChunk) {
 			int ax = (int) packet.getPacketValue("a");
 			int az = (int) packet.getPacketValue("b");
@@ -29,10 +34,10 @@ public class NPCDisplayListener implements PacketListener {
 					double bz = bc.getZ();
 					if (ax == bx && az == bz) {
 						Bukkit.getScheduler().runTask(KokuminCore.getInstance(), new BukkitRunnable() {
+							@Override
 							public void run() {
 								npc.update();
-								// npc.getPlayer().sendMessage(("§a[SUCCESS]update NPC (" + ax + ", " + az + "), (" + bx + ", " + bz +
-								// ")"));
+								// npc.getPlayer().sendMessage(("§a[SUCCESS]update NPC (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
 							}
 						});
 					}
@@ -45,10 +50,10 @@ public class NPCDisplayListener implements PacketListener {
 					double bz = bc.getZ();
 					if (ax == bx && az == bz) {
 						Bukkit.getScheduler().runTask(KokuminCore.getInstance(), new BukkitRunnable() {
+							@Override
 							public void run() {
 								hologram.update();
-								// hologram.getPlayer()
-								// .sendMessage(("§a[SUCCESS]update Hologram (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
+								// hologram.getPlayer().sendMessage(("§a[SUCCESS]update Hologram (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
 							}
 						});
 					}

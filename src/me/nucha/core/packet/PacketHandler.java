@@ -72,7 +72,7 @@ public class PacketHandler implements Listener {
 			}
 		};
 		ChannelPipeline pipeline = ((CraftPlayer) p).getHandle().playerConnection.networkManager.channel.pipeline();
-		pipeline.addBefore("packet_handler", "NPCDisplayPlugin_" + p.getName(), channelDuplexHandler);
+		pipeline.addBefore("packet_handler", "KokuminCore_" + p.getName(), channelDuplexHandler);
 	}
 
 	public static void unregisterPlayer(Player p) {

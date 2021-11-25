@@ -117,8 +117,9 @@ public class Hologram {
 			armorStand.setCustomNameVisible(true);
 			armorStand.setGravity(false);
 			PacketPlayOutEntityTeleport packetTeleport = new PacketPlayOutEntityTeleport(armorStand);
-			sendPacket(packetTeleport, packetSpawn);
-			y -= 0.4;
+			// sendPacket(packetTeleport, packetSpawn);
+			sendPacket(packetSpawn, packetTeleport);
+			y -= offsetY;
 			nmsArmorStands.add(armorStand);
 		}
 		shown = true;

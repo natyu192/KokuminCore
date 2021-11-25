@@ -8,9 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.EntityEffect;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -46,7 +44,6 @@ import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEffect;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEquipment;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityHeadRotation;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityMetadata;
-import net.minecraft.server.v1_8_R3.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityTeleport;
 import net.minecraft.server.v1_8_R3.PacketPlayOutNamedEntitySpawn;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo;
@@ -153,8 +150,7 @@ public class NPC {
 			return;
 		}
 		sendPacket(new PacketPlayOutEntityDestroy(entityPlayer.getId()));
-		this.entityPlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(),
-				convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()));
+		this.entityPlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()));
 		this.tab = tab;
 		PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn(entityPlayer);
 		/*Reflection.setValue(packet, "a", getId());
@@ -379,13 +375,10 @@ public class NPC {
 	}
 
 	public void teleport(Location loc, boolean onGround) {
-		entityPlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(),
-				convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()));
-		PacketPlayOutEntityLook look = new PacketPlayOutEntityLook(getId(),
-				(byte) convertCompressedAngle(loc.getYaw()), (byte) convertCompressedAngle(loc.getPitch()), true);
+		entityPlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()));
+		PacketPlayOutEntityLook look = new PacketPlayOutEntityLook(getId(), convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()), true);
 		entityPlayer.onGround = onGround;
-		PacketPlayOutEntityHeadRotation headRotation = new PacketPlayOutEntityHeadRotation(entityPlayer,
-				(byte) convertCompressedAngle(loc.getYaw()));
+		PacketPlayOutEntityHeadRotation headRotation = new PacketPlayOutEntityHeadRotation(entityPlayer, convertCompressedAngle(loc.getYaw()));
 		PacketPlayOutEntityTeleport teleport = new PacketPlayOutEntityTeleport(entityPlayer);
 		// sendPacket(look, teleport, headRotation);
 		sendPacket(look);
@@ -394,21 +387,19 @@ public class NPC {
 	}
 
 	public void move(Location loc) {
-		PacketPlayOutEntityLook packet = new PacketPlayOutEntityLook(getId(), convertCompressedAngle(loc.getYaw()),
-				convertCompressedAngle(loc.getPitch()), entityPlayer.onGround);
+		PacketPlayOutEntityLook packet = new PacketPlayOutEntityLook(getId(), convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()),
+				entityPlayer.onGround);
 		PacketPlayOutEntityHeadRotation headRotation = new PacketPlayOutEntityHeadRotation();
 		PacketPlayOutEntityTeleport teleport = new PacketPlayOutEntityTeleport(entityPlayer);
 		Reflection.setValue(headRotation, "a", getId());
 		Reflection.setValue(headRotation, "b", convertCompressedAngle(loc.getYaw()));
-		entityPlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(),
-				convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()));
+		entityPlayer.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), convertCompressedAngle(loc.getYaw()), convertCompressedAngle(loc.getPitch()));
 		entityPlayer.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 		sendPacket(packet, headRotation, teleport);
 	}
 
 	public void move(float yaw, float pitch, boolean isOnGround) {
-		PacketPlayOutEntityLook packet = new PacketPlayOutEntityLook(getId(), convertCompressedAngle(yaw), convertCompressedAngle(pitch),
-				isOnGround);
+		PacketPlayOutEntityLook packet = new PacketPlayOutEntityLook(getId(), convertCompressedAngle(yaw), convertCompressedAngle(pitch), isOnGround);
 		PacketPlayOutEntityHeadRotation headRotation = new PacketPlayOutEntityHeadRotation();
 		PacketPlayOutEntityTeleport teleport = new PacketPlayOutEntityTeleport(entityPlayer);
 		Reflection.setValue(headRotation, "a", getId());
@@ -490,7 +481,7 @@ public class NPC {
 	}
 
 	public int getFixLocation(double pos) {
-		return (int) MathHelper.floor(pos * 32.0D);
+		return MathHelper.floor(pos * 32.0D);
 	}
 
 	public byte getFixRotation(float yawpitch) {
@@ -499,10 +490,15 @@ public class NPC {
 
 	public void damageEffect() {
 		if (noDamageTick == 0) {
-			PacketPlayOutEntityStatus packet1 = new PacketPlayOutEntityStatus(entityPlayer, EntityEffect.HURT.getData());
+			/*PacketPlayOutEntityStatus packet1 = new PacketPlayOutEntityStatus(entityPlayer, EntityEffect.HURT.getData());
 			((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet1);
-			p.playSound(p.getLocation(), Sound.HURT_FLESH, 1f, 1f);
+			Location l = p.getLocation();
+			double x = l.getX();
+			double y = l.getY();
+			double z = l.getZ();
+			PacketPlayOutNamedSoundEffect packet2 = new PacketPlayOutNamedSoundEffect(CraftSound.getSound(Sound.HURT_FLESH), x, y, z, 1f, 1f);
 			noDamageTick = 10;
+			((CraftPlayer) p).getHandle().playerConnection.sendPacket(packet2);*/
 		}
 	}
 

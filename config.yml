@@ -1,0 +1,7 @@
+database:
+  host: host
+  database: database
+  username: user
+  password: pass
+  port: port
+  table: table

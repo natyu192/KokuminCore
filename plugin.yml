@@ -1,3 +1,10 @@
 name: KokuminCore
 version: 1.0
 main: me.nucha.core.KokuminCore
+commands:
+  npcupdater:
+    permission: kokumincore.npcupdater
+  prefix:
+    permission: kokumincore.prefix
+  sprefix:
+    permission: kokumincore.prefix
