@@ -2,10 +2,7 @@ package me.nucha.core.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,6 +53,7 @@ public class SQLManager {
 			}
 			setConnection(DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database, username, password));
 			Bukkit.getConsoleSender().sendMessage("§8[§aKokuminCore§8] §aMySQL connected: §e" + host);
+			PrefixManager.init(connection);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			timeFailedToConnect++;
@@ -79,48 +77,4 @@ public class SQLManager {
 	public static void setConnection(Connection connection) {
 		SQLManager.connection = connection;
 	}
-
-	public static boolean isPrefixSet(UUID uuid, boolean shorter) {
-		String prefix = getPrefix(uuid, shorter);
-		return prefix != null && !prefix.isEmpty();
-	}
-
-	public static void setPrefix(UUID uuid, String prefix, boolean shorter) {
-		try {
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM prefix WHERE UUID=?");
-			statement.setString(1, uuid.toString());
-			ResultSet results = statement.executeQuery();
-			if (results.next()) { // If line is already inserted:
-				PreparedStatement insert = connection.prepareStatement("UPDATE prefix SET " + (shorter ? "SHORT" : "") + "PREFIX=? WHERE UUID=?");
-				insert.setString(1, prefix);
-				insert.setString(2, uuid.toString());
-				insert.executeUpdate();
-			} else {
-				PreparedStatement insert = connection.prepareStatement("INSERT INTO prefix (UUID," + (shorter ? "SHORT" : "") + "PREFIX) VALUES (?,?)");
-				insert.setString(1, uuid.toString());
-				insert.setString(2, prefix);
-				insert.executeUpdate();
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static String getPrefix(UUID uuid, boolean shorter) {
-		try {
-			if (connection != null) {
-				PreparedStatement statement = connection.prepareStatement("SELECT * FROM prefix WHERE UUID=?");
-				statement.setString(1, uuid.toString());
-				ResultSet results = statement.executeQuery();
-				if (results.next()) {
-					String prefix = results.getString((shorter ? "SHORT" : "") + "PREFIX");
-					return prefix != null ? prefix : "";
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-
 }

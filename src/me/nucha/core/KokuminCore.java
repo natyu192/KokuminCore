@@ -9,7 +9,6 @@ import me.nucha.core.listener.NPCDisplayListener;
 import me.nucha.core.listener.NPCUpdater;
 import me.nucha.core.npc.NPCManager;
 import me.nucha.core.packet.PacketHandler;
-import me.nucha.core.sql.PrefixManager;
 import me.nucha.core.sql.SQLManager;
 
 public class KokuminCore extends JavaPlugin {
@@ -21,16 +20,14 @@ public class KokuminCore extends JavaPlugin {
 	public void onEnable() {
 		plugin = this;
 		saveDefaultConfig();
-		SQLManager.init(plugin);
-		PrefixManager.init(plugin);
 		PacketHandler.init();
+		SQLManager.init(plugin);
 		NPCManager.init();
 		HologramManager.init();
 		NPCUpdater.init();
 		PacketHandler.registerPacketListener(npcDisplayListener = new NPCDisplayListener());
 		getCommand("npcupdater").setExecutor(new CommandNPCUpdater());
 		getCommand("prefix").setExecutor(new CommandPrefix());
-		getCommand("sprefix").setExecutor(new CommandPrefix());
 	}
 
 	@Override

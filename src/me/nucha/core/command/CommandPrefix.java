@@ -1,5 +1,8 @@
 package me.nucha.core.command;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -8,7 +11,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import me.nucha.core.KokuminCore;
-import me.nucha.core.sql.SQLManager;
+import me.nucha.core.sql.PrefixManager;
+import me.nucha.core.sql.dao.Prefix;
 
 public class CommandPrefix implements CommandExecutor {
 
@@ -18,56 +22,58 @@ public class CommandPrefix implements CommandExecutor {
 			Bukkit.getScheduler().runTaskAsynchronously(KokuminCore.getInstance(), new Runnable() {
 				@Override
 				public void run() {
-					if (args.length == 1) {
-						OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-						String prefix = SQLManager.getPrefix(target.getUniqueId(), false);
-						if (prefix.isEmpty()) {
-							sender.sendMessage("§6" + target.getName() + "にはPrefixがありません");
-						} else {
-							prefix = ChatColor.translateAlternateColorCodes('&', prefix);
-							sender.sendMessage(target.getName() + "のPrefix: " + prefix);
-						}
-						return;
-					}
 					if (args.length == 2) {
-						OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-						String prefix = args[1];
-						SQLManager.setPrefix(target.getUniqueId(), prefix, false);
-						prefix = ChatColor.translateAlternateColorCodes('&', prefix);
-						sender.sendMessage(target.getName() + "のPrefixを変更: " + prefix);
-						return;
-					}
-					sender.sendMessage("§cUsage: /prefix <player> --- prefixを確認");
-					sender.sendMessage("§cUsage: /prefix <player> <prefix> --- prefixを設定");
-				}
-			});
-			return true;
-		}
-		if (cmd.getName().equalsIgnoreCase("sprefix")) {
-			Bukkit.getScheduler().runTaskAsynchronously(KokuminCore.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					if (args.length == 1) {
-						OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-						String prefix = SQLManager.getPrefix(target.getUniqueId(), true);
-						if (prefix.isEmpty()) {
-							sender.sendMessage("§6" + target.getName() + "にはShort Prefixがありません");
-						} else {
-							prefix = ChatColor.translateAlternateColorCodes('&', prefix);
-							sender.sendMessage(target.getName() + "のShort Prefix: " + prefix);
+						if (args[0].equalsIgnoreCase("list")) {
+							OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+							UUID uuid = target.getUniqueId();
+							List<Prefix> prefixes = PrefixManager.getPrefixes(uuid);
+							String prefix = PrefixManager.getPrefix(uuid);
+							if (prefix.isEmpty()) {
+								sender.sendMessage("§6" + target.getName() + "にはPrefixがありません");
+							} else {
+								sender.sendMessage(target.getName() + "のPrefix: " + prefix);
+								sender.sendMessage("内訳:");
+								for (int i = 0; i < prefixes.size(); i++) {
+									Prefix pr = prefixes.get(i);
+									sender.sendMessage((i + 1) + ". " + pr.getId() + ": " + pr.getPrefix() + " --- " + pr.getDescription());
+								}
+							}
+							return;
 						}
-						return;
 					}
-					if (args.length == 2) {
-						OfflinePlayer target = Bukkit.getOfflinePlayer(args[0]);
-						String prefix = args[1];
-						SQLManager.setPrefix(target.getUniqueId(), prefix, true);
-						prefix = ChatColor.translateAlternateColorCodes('&', prefix);
-						sender.sendMessage(target.getName() + "のShort Prefixを変更: " + prefix);
-						return;
+					if (args.length == 3) {
+						if (args[0].equalsIgnoreCase("remove")) {
+							OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+							String id = args[2];
+							PrefixManager.removePrefix(target.getUniqueId(), id);
+							sender.sendMessage(target.getName() + "のPrefixを削除: " + id);
+							return;
+						}
 					}
-					sender.sendMessage("§cUsage: /sprefix <player> --- short prefixを確認");
-					sender.sendMessage("§cUsage: /sprefix <player> <prefix> --- short prefixを設定");
+					if (args.length >= 4) {
+						if (args[0].equalsIgnoreCase("add")) {
+							OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
+							String id = args[2];
+							String prefix = args[3];
+							StringBuilder descriptionBuilder = new StringBuilder();
+							if (args.length >= 5) {
+								for (int i = 4; i < args.length; i++) {
+									descriptionBuilder.append(args[i]);
+									if (i != args.length - 1) {
+										descriptionBuilder.append(" ");
+									}
+								}
+							}
+							String description = descriptionBuilder.toString();
+							PrefixManager.addPrefix(target.getUniqueId(), new Prefix(id, prefix, description));
+							prefix = ChatColor.translateAlternateColorCodes('&', prefix);
+							sender.sendMessage(target.getName() + "のPrefixを追加: " + id + ", " + prefix + ", " + description);
+							return;
+						}
+					}
+					sender.sendMessage("§cUsage: /prefix list <player> --- prefixを確認");
+					sender.sendMessage("§cUsage: /prefix add <player> <id> <prefix> [description ...] --- prefixを追加");
+					sender.sendMessage("§cUsage: /prefix remove <player> <id> --- prefixを削除");
 				}
 			});
 			return true;

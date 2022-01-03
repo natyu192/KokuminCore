@@ -1,51 +1,128 @@
 package me.nucha.core.sql;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
 import me.nucha.core.KokuminCore;
+import me.nucha.core.sql.dao.Prefix;
+import me.nucha.core.sql.dao.PrefixesDao;
+import me.nucha.core.sql.dao.PrefixesDaoImpl;
 
 public class PrefixManager {
 
-	private static HashMap<UUID, String> prefixes;
-	private static HashMap<UUID, String> shortprefixes;
+	private static PrefixesDao prefixesDao;
+	private static HashMap<UUID, List<Prefix>> prefixes = new HashMap<>();;
 
-	public static void init(KokuminCore plugin) {
-		prefixes = new HashMap<>();
-		shortprefixes = new HashMap<>();
-		plugin.getServer().getPluginManager().registerEvents(new Listener() {
-			@EventHandler
-			public void onJoin(PlayerJoinEvent event) {
-				Player p = event.getPlayer();
-				UUID uuid = p.getUniqueId();
-				Bukkit.getScheduler().runTaskAsynchronously(plugin, new BukkitRunnable() {
-					@Override
-					public void run() {
-						String prefix = SQLManager.getPrefix(uuid, false);
-						prefix = ChatColor.translateAlternateColorCodes('&', prefix);
-						prefixes.put(uuid, prefix);
-						String shortprefix = SQLManager.getPrefix(uuid, true);
-						shortprefix = ChatColor.translateAlternateColorCodes('&', shortprefix);
-						shortprefixes.put(uuid, shortprefix);
-					}
-				});
-			}
-		}, plugin);
+	public static void init(Connection connection) {
+		prefixesDao = new PrefixesDaoImpl(connection);
+		Bukkit.getServer().getPluginManager().registerEvents(new JoinListener(), KokuminCore.getInstance());
+
+		try {
+			prefixesDao.createDatabase();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public static String getPrefix(UUID uuid, boolean shorter) {
-		if (!prefixes.containsKey(uuid)) {
+	public static List<Prefix> getPrefixes(UUID uuid) {
+		if (prefixesDao == null) {
+			return new ArrayList<>();
+		}
+		if (prefixes.containsKey(uuid)) {
+			return prefixes.get(uuid);
+		}
+		try {
+			List<Prefix> list = prefixesDao.selectAll(uuid.toString());
+			prefixes.put(uuid, list);
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
+
+	public static String getPrefix(UUID uuid) {
+		if (prefixesDao == null) {
 			return "";
 		}
-		return shorter ? shortprefixes.get(uuid) : prefixes.get(uuid);
+		StringBuilder sbuilder = new StringBuilder();
+		getPrefixes(uuid).forEach(s -> sbuilder.append(ChatColor.translateAlternateColorCodes('&', s.getPrefix())));
+		return sbuilder.toString();
 	}
 
+	public static void addPrefix(UUID uuid, Prefix prefix) {
+		if (prefixesDao == null) {
+			return;
+		}
+		Bukkit.getScheduler().runTaskAsynchronously(KokuminCore.getInstance(), () -> {
+			try {
+				if (!prefixes.containsKey(uuid)) {
+					prefixesDao.createTable(uuid.toString());
+					prefixes.put(uuid, new ArrayList<>());
+				}
+				prefixesDao.add(uuid.toString(), prefix);
+				prefixes.get(uuid).add(prefix);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	public static void removePrefix(UUID uuid, String id) {
+		if (prefixesDao == null) {
+			return;
+		}
+		if (!prefixes.containsKey(uuid)) {
+			return;
+		}
+		Bukkit.getScheduler().runTaskAsynchronously(KokuminCore.getInstance(), () -> {
+			try {
+				prefixesDao.delete(uuid.toString(), id);
+				List<Prefix> list = prefixes.get(uuid);
+				for (int i = 0; i < list.size(); i++) {
+					if (list.get(i).getId().equalsIgnoreCase(id)) {
+						list.remove(i);
+						return;
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	protected static void cachePrefix(UUID uuid, List<Prefix> prefix) {
+		prefixes.put(uuid, prefix);
+	}
+
+	protected static PrefixesDao getPrefixesDao() {
+		return prefixesDao;
+	}
+
+}
+
+class JoinListener implements Listener {
+
+	@EventHandler
+	public void onJoin(AsyncPlayerPreLoginEvent event) {
+		UUID uuid = event.getUniqueId();
+		try {
+			PrefixesDao dao = PrefixManager.getPrefixesDao();
+			dao.createTable(uuid.toString());
+			List<Prefix> prefix = dao.selectAll(uuid.toString());
+			PrefixManager.cachePrefix(uuid, prefix);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

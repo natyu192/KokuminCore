@@ -6,5 +6,3 @@ commands:
     permission: kokumincore.npcupdater
   prefix:
     permission: kokumincore.prefix
-  sprefix:
-    permission: kokumincore.prefix
