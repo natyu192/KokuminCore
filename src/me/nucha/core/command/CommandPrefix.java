@@ -31,7 +31,7 @@ public class CommandPrefix implements CommandExecutor {
 							if (prefix.isEmpty()) {
 								sender.sendMessage("§6" + target.getName() + "にはPrefixがありません");
 							} else {
-								sender.sendMessage(target.getName() + "のPrefix: " + prefix);
+								sender.sendMessage("プレビュー: " + prefix + target.getName());
 								sender.sendMessage("内訳:");
 								for (int i = 0; i < prefixes.size(); i++) {
 									Prefix pr = prefixes.get(i);
