@@ -23,4 +23,5 @@ public class Prefix {
 	public String getDescription() {
 		return description;
 	}
+
 }

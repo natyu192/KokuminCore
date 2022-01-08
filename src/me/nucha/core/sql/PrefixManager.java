@@ -21,7 +21,8 @@ import me.nucha.core.sql.dao.PrefixesDaoImpl;
 public class PrefixManager {
 
 	private static PrefixesDao prefixesDao;
-	private static HashMap<UUID, List<Prefix>> prefixes = new HashMap<>();;
+	private static HashMap<UUID, List<Prefix>> prefixes = new HashMap<>();
+	private static HashMap<String, String> unicodeChars = new HashMap<>();
 
 	public static void init(Connection connection) {
 		prefixesDao = new PrefixesDaoImpl(connection);
@@ -32,6 +33,13 @@ public class PrefixManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		unicodeChars.put("star", "✫");
+		unicodeChars.put("flower", "✿");
+		unicodeChars.put("arrow", "➳");
+		unicodeChars.put("heart", "❤");
+		unicodeChars.put("star2", "✯");
+		unicodeChars.put("check", "✔");
+		unicodeChars.put("s", "☯");
 	}
 
 	public static List<Prefix> getPrefixes(UUID uuid) {
@@ -56,7 +64,12 @@ public class PrefixManager {
 			return "";
 		}
 		StringBuilder sbuilder = new StringBuilder();
-		getPrefixes(uuid).forEach(s -> sbuilder.append(ChatColor.translateAlternateColorCodes('&', s.getPrefix())));
+		for (Prefix prefix : getPrefixes(uuid)) {
+			String s = prefix.getPrefix();
+			s = ChatColor.translateAlternateColorCodes('&', prefix.getPrefix());
+			s = replaceUnicodes(s);
+			sbuilder.append(s);
+		}
 		return sbuilder.toString();
 	}
 
@@ -107,6 +120,13 @@ public class PrefixManager {
 
 	protected static PrefixesDao getPrefixesDao() {
 		return prefixesDao;
+	}
+
+	public static String replaceUnicodes(String s) {
+		for (String key : unicodeChars.keySet()) {
+			s = s.replaceAll("\\{" + key + "\\}", unicodeChars.get(key));
+		}
+		return s;
 	}
 
 }
