@@ -54,7 +54,6 @@ public class PrefixManager {
 			prefixes.put(uuid, list);
 			return list;
 		} catch (SQLException e) {
-			e.printStackTrace();
 			return new ArrayList<>();
 		}
 	}
