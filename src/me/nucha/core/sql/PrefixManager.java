@@ -84,17 +84,14 @@ public class PrefixManager {
 				}
 				prefixesDao.add(uuid.toString(), prefix);
 				Prefix toRemove = null;
-				for (UUID _uuid : prefixes.keySet()) {
-					for (Prefix _prefix : prefixes.get(_uuid)) {
-						if (_prefix.getId().equalsIgnoreCase(prefix.getId())) {
-							toRemove = _prefix;
-							break;
-						}
-					}
-					if (toRemove != null) {
-						prefixes.get(_uuid).remove(toRemove);
+				for (Prefix _prefix : prefixes.get(uuid)) {
+					if (_prefix.getId().equalsIgnoreCase(prefix.getId())) {
+						toRemove = _prefix;
 						break;
 					}
+				}
+				if (toRemove != null) {
+					prefixes.get(uuid).remove(toRemove);
 				}
 				prefixes.get(uuid).add(prefix);
 			} catch (SQLException e) {
