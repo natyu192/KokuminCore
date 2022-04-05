@@ -2,7 +2,6 @@ package me.nucha.core.listener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.google.common.collect.Lists;
 
@@ -33,13 +32,10 @@ public class NPCDisplayListener implements PacketListener {
 					double bx = bc.getX();
 					double bz = bc.getZ();
 					if (ax == bx && az == bz) {
-						Bukkit.getScheduler().runTask(KokuminCore.getInstance(), new BukkitRunnable() {
-							@Override
-							public void run() {
-								npc.update();
-								// npc.getPlayer().sendMessage(("§a[SUCCESS]update NPC (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
-							}
-						});
+//						Bukkit.getScheduler().runTask(KokuminCore.getInstance(), () -> {
+						npc.update();
+						// npc.getPlayer().sendMessage(("§a[SUCCESS]update NPC (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
+//						});
 					}
 				}
 			}
@@ -49,12 +45,9 @@ public class NPCDisplayListener implements PacketListener {
 					double bx = bc.getX();
 					double bz = bc.getZ();
 					if (ax == bx && az == bz) {
-						Bukkit.getScheduler().runTask(KokuminCore.getInstance(), new BukkitRunnable() {
-							@Override
-							public void run() {
-								hologram.update();
-								// hologram.getPlayer().sendMessage(("§a[SUCCESS]update Hologram (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
-							}
+						Bukkit.getScheduler().runTask(KokuminCore.getInstance(), () -> {
+							hologram.update();
+							// hologram.getPlayer().sendMessage(("§a[SUCCESS]update Hologram (" + ax + ", " + az + "), (" + bx + ", " + bz + ")"));
 						});
 					}
 				}
