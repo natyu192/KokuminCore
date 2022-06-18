@@ -1,5 +1,6 @@
 package me.nucha.core.command;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +23,16 @@ public class CommandPrefix implements CommandExecutor {
 			Bukkit.getScheduler().runTaskAsynchronously(KokuminCore.getInstance(), new Runnable() {
 				@Override
 				public void run() {
+					if (args.length == 1) {
+						if (args[0].equalsIgnoreCase("unicodes")) {
+							HashMap<String, String> map = PrefixManager.getUnicodeChars();
+							sender.sendMessage("§a------ Unicode文字の一覧 ------");
+							for (String k : map.keySet()) {
+								sender.sendMessage("{" + k + "} => " + map.get(k));
+							}
+							return;
+						}
+					}
 					if (args.length == 2) {
 						if (args[0].equalsIgnoreCase("list")) {
 							OfflinePlayer target = Bukkit.getOfflinePlayer(args[1]);
@@ -74,6 +85,7 @@ public class CommandPrefix implements CommandExecutor {
 					sender.sendMessage("§cUsage: /prefix list <player> --- prefixを確認");
 					sender.sendMessage("§cUsage: /prefix add <player> <id> <prefix> [description ...] --- prefixを追加");
 					sender.sendMessage("§cUsage: /prefix remove <player> <id> --- prefixを削除");
+					sender.sendMessage("§cUsage: /prefix unicodes --- 使用可能なUnicode文字の一覧を表示");
 				}
 			});
 			return true;

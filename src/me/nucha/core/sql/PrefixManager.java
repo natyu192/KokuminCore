@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class PrefixManager {
 
 	private static PrefixesDao prefixesDao;
 	private static HashMap<UUID, List<Prefix>> prefixes = new HashMap<>();
-	private static HashMap<String, String> unicodeChars = new HashMap<>();
+	private static LinkedHashMap<String, String> unicodeChars = new LinkedHashMap<>();
 
 	public static void init(Connection connection) {
 		prefixesDao = new PrefixesDaoImpl(connection);
@@ -138,6 +139,10 @@ public class PrefixManager {
 
 	protected static PrefixesDao getPrefixesDao() {
 		return prefixesDao;
+	}
+
+	public static HashMap<String, String> getUnicodeChars() {
+		return unicodeChars;
 	}
 
 	public static String replaceUnicodes(String s) {
