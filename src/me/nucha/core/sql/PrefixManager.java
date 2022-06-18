@@ -33,13 +33,22 @@ public class PrefixManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		unicodeChars.put("star", "✫");
 		unicodeChars.put("flower", "✿");
-		unicodeChars.put("arrow", "➳");
-		unicodeChars.put("heart", "❤");
-		unicodeChars.put("star2", "✯");
-		unicodeChars.put("check", "✔");
+		unicodeChars.put("pound", "£");
+		unicodeChars.put("star", "✫");
 		unicodeChars.put("s", "☯");
+		unicodeChars.put("sigma", "Σ");
+		unicodeChars.put("circled_star", "✪");
+		unicodeChars.put("star2", "✯");
+		unicodeChars.put("arrow", "➳");
+		unicodeChars.put("manzi", "卍");
+		unicodeChars.put("dagger", "✞");
+		unicodeChars.put("x", "✘");
+		unicodeChars.put("heart", "❤");
+		unicodeChars.put("heart2", "❥");
+		unicodeChars.put("peace", "✌");
+		unicodeChars.put("check", "✔");
+		unicodeChars.put("airplane", "✈");
 	}
 
 	public static List<Prefix> getPrefixes(UUID uuid) {
